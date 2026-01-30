@@ -1,0 +1,20 @@
+from django.urls import path
+from .views import CustomerApiView,ProductApiView,ExpenseApiView,ProductCatApiView,ExpenseCatApiView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+urlpatterns = [
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    path("client/",CustomerApiView.as_view(),name="customer_list"),
+    path("client/<int:pk>/",CustomerApiView.as_view(),name="customer_detail"),
+    path("product/",ProductApiView.as_view()),
+    path("product/<int:pk>/",ProductApiView.as_view()),
+    path("productCat/",ProductCatApiView.as_view()),
+    path("productCat/<int:pk>/",ProductCatApiView.as_view()),
+    path("expense/",ExpenseApiView.as_view()),
+    path("expense/<int:pk>/",ExpenseApiView.as_view()),
+    path("expenseCat/",ExpenseCatApiView.as_view())
+]

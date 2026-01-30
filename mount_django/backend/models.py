@@ -12,7 +12,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
     has_paid_for_company = models.BooleanField(default=False)
-    payment_date = models.DateField(null=True, blank=True)
+    created_at = models.DateField(null=True, blank=True)
 
     owned_company = models.OneToOneField(
         "Company",
@@ -62,24 +62,11 @@ class Customer(models.Model):  # sabina
     email = models.EmailField(blank=True)
     pan_id = models.CharField(max_length=15, blank=True)
     address = models.CharField(max_length=15, blank=True)
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     customer_type = models.CharField(max_length=10,choices=CUSTOMER_TYPE_CHOICES,default="CUSTOMER")
     def __str__(self):
         return f"{self.name} ({self.company})"
 
-
-class Supplier(models.Model):
-    company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name="suppliers"
-    )
-    name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15, blank=True)
-    email = models.EmailField(blank=True)
-    pan_id = models.CharField(max_length=15, blank=True)
-    address = models.CharField(max_length=15, blank=True)
-
-    def __str__(self):
-        return f"{self.name} ({self.company})"
 
 
 class ProductCategory(models.Model):
@@ -112,8 +99,8 @@ class Product(models.Model):
         blank=True,
         related_name="products",
     )
-    low_stock_bar = models.IntegerField(default=0)
-    date_added = models.DateTimeField(default=timezone.now)
+    low_stock = models.IntegerField(default=0)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ["company", "name"]
@@ -128,7 +115,7 @@ class OrderList(models.Model):
     )
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
 
-    order_date = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
     customer = models.ForeignKey(
         Customer,
         on_delete=models.CASCADE,
@@ -203,9 +190,6 @@ class OrderSummary(models.Model):
                 "(maximum allowed is 99,999,999.99)."
             ]
 
-        # You can also add custom rules for discount/tax if you want:
-        # e.g. discount and tax should not be negative, or greater than some limit, etc.
-
         if errors:
             # Raise one ValidationError containing field-specific messages
             raise ValidationError(errors)
@@ -234,7 +218,7 @@ class Purchase(models.Model):
     remaining = models.OneToOneField(RemainingAmount,on_delete=models.SET_NULL,null=True,related_name="remainingafterpurchase")
 
     uid = models.UUIDField(default=uuid.uuid4, editable=False)
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -258,7 +242,7 @@ class Bill(models.Model):
     # NEW: Description for simple invoice items
     description = models.TextField(blank=True, null=True)
 
-    bill_date = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
     @property
     def line_total(self):
@@ -301,7 +285,7 @@ class ItemActivity(models.Model):
         Product, on_delete=models.PROTECT, null=True, related_name="activities"
     )
     type = models.CharField(max_length=200)
-    date = models.DateField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
     change = models.CharField()
     quantity = models.IntegerField()
     remarks = models.CharField(max_length=200, blank=True ,null=True)
@@ -316,7 +300,7 @@ class PaymentIn(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.PROTECT,related_name="paymentIn")
     remainings = models.OneToOneField(RemainingAmount,on_delete=models.CASCADE,related_name="paymentInRemaining")
     
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     payment_in = models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
     remarks = models.CharField(max_length=200,blank=True)
     
@@ -330,7 +314,7 @@ class PaymentOut(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.PROTECT,related_name="paymentOut")
     remainings = models.OneToOneField(RemainingAmount,on_delete=models.CASCADE,related_name="paymentOutRemaining")
     
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     payment_out = models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
     remarks = models.CharField(max_length=200,blank=True)
     
@@ -341,13 +325,13 @@ class BalanceAdjustment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT,related_name = "customerBalanceAdjustment")
     remainings = models.OneToOneField(RemainingAmount,on_delete=models.CASCADE,related_name="balanceAdustRemaining")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     remarks = models.TextField(max_length=255,blank=True)
 
 
 class ExpenseCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    companies = models.ManyToManyField(Company, blank=True, related_name='expense_categories'
+    company = models.ForeignKey(Company, on_delete=models.CASCADE,blank=True, related_name='expense_categories'
     )
 
     def __str__(self):
@@ -359,7 +343,7 @@ class Expense(models.Model):
     category = models.ForeignKey(ExpenseCategory,on_delete=models.SET_NULL,related_name="category",null = True)
 
     expense_number = models.IntegerField()
-    date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10,decimal_places=2)
     remarks = models.CharField(max_length=255,blank=True)
     def __str__(self):

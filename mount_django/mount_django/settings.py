@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "billingsystem",
+    "backend",
+    "rest_framework",
     "tailwind",
     "theme",
     "django_browser_reload",
@@ -120,7 +121,17 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = "billingsystem.User"
+AUTH_USER_MODEL = "backend.User"
+
+# JWT authentication
+REST_FRAMEWORK ={
+    "DEFAULT_AUTHENTICATION_CLASSES":(
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES":(
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -142,3 +153,9 @@ SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds (optional)
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+from datetime import timedelta
+SIMPLE_JWT ={
+    "ACCESS_TOKEN_LIFETIME":timedelta(hours=12),
+    "REFRESH_TOKEN_LIFETIME":timedelta(days=1)
+}

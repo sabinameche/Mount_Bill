@@ -61,10 +61,10 @@ class CustomUserAdmin(UserAdmin):
         "owned_company_info",
         "active_company_info",
         "is_staff",
-        "date_joined",
+        "created_at",
         
     )
-    list_filter = ("has_paid_for_company", "is_staff", "is_active", "date_joined")
+    list_filter = ("has_paid_for_company", "is_staff", "is_active", "created_at")
 
     fieldsets = (
         (None, {"fields": ("username", "password")}),
@@ -84,7 +84,6 @@ class CustomUserAdmin(UserAdmin):
             {
                 "fields": (
                     "has_paid_for_company",
-                    "payment_date",
                     "owned_company",
                     "active_company",
                 )
@@ -102,7 +101,7 @@ class CustomUserAdmin(UserAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (_("Important dates"), {"fields": ("last_login", "created_at")}),
     )
 
     add_fieldsets = (
@@ -122,7 +121,7 @@ class CustomUserAdmin(UserAdmin):
     )
 
     search_fields = ("username", "email", "phone")
-    ordering = ("-date_joined",)
+    ordering = ("-created_at",)
     filter_horizontal = (
         "groups",
         "user_permissions",
@@ -171,10 +170,10 @@ class ProductAdmin(admin.ModelAdmin):
         "product_quantity",
         "category",
         "company",
-        "date_added",
-        "low_stock_bar",
+        "created_at",
+        "low_stock",
     )
-    list_filter = ("company", "category", "date_added")
+    list_filter = ("company", "category", "created_at")
     search_fields = ("name", "company__name", "category__name")
     raw_id_fields = ("category",)
 
@@ -186,10 +185,10 @@ class OrderListAdmin(admin.ModelAdmin):
         "id",
         "customer",
         "company",
-        "order_date",
+        "created_at",
         "created_by",
     )
-    list_filter = ("company", "order_date")
+    list_filter = ("company", "created_at")
     search_fields = ("customer__name", "company__name", "created_by__username")
     raw_id_fields = ("customer", "created_by")
 
@@ -203,11 +202,11 @@ class BillAdmin(admin.ModelAdmin):
         "product",
         "quantity",
         "product_price",
-        "bill_date",
+        "created_at",
         "total_price",
         "discount",
     )
-    list_filter = ("bill_date", "order__company")
+    list_filter = ("created_at", "order__company")
     search_fields = ("order__id", "product__name")
     raw_id_fields = ("order", "product")
 
@@ -265,7 +264,7 @@ class ItemActivityAdmin(admin.ModelAdmin):
         "purchase",
         "product",
         "type",
-        "date",
+        "created_at",
         "change",
         "quantity",
     )
@@ -275,7 +274,7 @@ class ItemActivityAdmin(admin.ModelAdmin):
 class PaymentInAdmin(admin.ModelAdmin):
     list_display = (
         "customer",
-        "date",
+        "created_at",
         "payment_in",
         "remarks",
         "remainings"
@@ -286,7 +285,7 @@ class PaymentInAdmin(admin.ModelAdmin):
 class PaymentOutAdmin(admin.ModelAdmin):
     list_display = (
         "customer",
-        "date",
+        "created_at",
         "payment_out",
         "remarks",
     )
@@ -297,7 +296,7 @@ class BalanceAdjustmentAdmin(admin.ModelAdmin):
     list_display = (
         "customer",
         "amount",
-        "date",
+        "created_at",
     )
     search_fields = ("customer_id",)
 
@@ -309,10 +308,10 @@ class ExpenseCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display=("date","expense_number","total_amount","remarks","category",)
-    search_fields = ("date",)
+    list_display=("id","created_at","expense_number","total_amount","remarks","category",)
+    search_fields = ("created_at",)
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display=("uid","id","date","customer","summary")
-    search_fields = ("date",)
+    list_display=("uid","id","created_at","customer","summary")
+    search_fields = ("created_at",)
