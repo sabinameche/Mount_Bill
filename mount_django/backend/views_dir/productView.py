@@ -12,11 +12,25 @@ class ProductApiView(APIView):
     def __get_company(self):
         return self.request.user.active_company or self.request.owned_company  
     
-    def get(self,request):
+    def get(self,request,pk=None):
         company = self.__get_company()
         if not company:
             raise ValidationError({"company":"User has no owned_company or active_company!!"})
 
+        if pk:
+            try:
+                product = Product.objects.get(id=pk,company=company)
+            except Product.DoesNotExist:
+                raise ValidationError({"error":"No such Product found!"})
+            return Response({
+                "name":product.name,
+                "cost_price":product.cost_price,
+                "selling_price":product.selling_price,
+                "category":product.category.name,
+                "uid":product.uid,
+                "low_stock":product.low_stock,
+            })
+            
         product = Product.objects.filter(company=company)
         serializer = ProductSerializer(product,many=True)
         return Response({"products":serializer.data})
@@ -57,4 +71,4 @@ class ProductApiView(APIView):
         except Product.DoesNotExist:
             return Response({"message": "No such product found"})
         product.delete()
-        return Response({"message": "Customer deleted successfully"})
+        return Response({"message": "Product deleted successfully"})

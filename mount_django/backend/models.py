@@ -66,6 +66,11 @@ class Customer(models.Model):  # sabina
     customer_type = models.CharField(max_length=10,choices=CUSTOMER_TYPE_CHOICES,default="CUSTOMER")
     def __str__(self):
         return f"{self.name} ({self.company})"
+    
+    class Meta:
+        constraints =[
+            models.UniqueConstraint(fields=['company','name'],name="unique_customer_per_company")
+                    ]
 
 
 
@@ -107,6 +112,12 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.company})"
+    
+    def save(self,*args, **kwargs):
+        if self.category_id is None:
+            self.category,_ = ProductCategory.objects.get_or_create(company=self.company,name="General")
+        super().save(*args, **kwargs)
+
 
 
 class OrderList(models.Model):
@@ -330,12 +341,18 @@ class BalanceAdjustment(models.Model):
 
 
 class ExpenseCategory(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE,blank=True, related_name='expense_categories'
     )
-
+    is_global = models.BooleanField(default= False)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['company','name'],name='unique_expenseCategory_per_company')
+        ]
     def __str__(self):
         return self.name
+        
 
 
 class Expense(models.Model):

@@ -22,7 +22,7 @@ class ProductCatApiView(APIView):
         except ProductCategory.DoesNotExist:
             raise ValidationError({"message":"No such productCategory found!"})
         serializer = ProductCatSerializer(productCategory,many = True)
-        return Response(serializer.data)
+        return Response({"category":serializer.data})
 
     def post(self,request):
         company = self.__get__company()

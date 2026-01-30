@@ -12,11 +12,26 @@ class CustomerApiView(APIView):
     def __get_company(self):
         return self.request.user.active_company or self.request.user.owned_company
     
-    def get(self,request):
+    def get(self,request,pk=None):
         company = self.__get_company()
 
         if not company:
             raise ValidationError({"company":"User has no active/owned company!!"})
+        
+        if pk:
+            try:
+                customer = Customer.objects.get(id=pk,company=company)
+            except Customer.DoesNotExist:
+                raise ValidationError({"error":"No such customer found!"})
+            return Response({
+                "name":customer.name,
+                "phone":customer.phone or "",
+                "address":customer.address or "",
+                "pan_id":customer.pan_id or "",
+                "email":customer.email or  "",
+                "customer_type":customer.customer_type,
+                "uid":customer.uid or "",
+            })
         
         customers = Customer.objects.filter(company=company)
         serializer = CustomerSerializer(customers,many = True)
