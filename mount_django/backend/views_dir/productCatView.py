@@ -20,7 +20,7 @@ class ProductCatApiView(APIView):
         try:
             productCategory = ProductCategory.objects.filter(company=company)
         except ProductCategory.DoesNotExist:
-            raise ValidationError({"message":"No such productCategory found!"})
+            raise ValidationError({"message":"No productCategory found!"})
         serializer = ProductCatSerializer(productCategory,many = True)
         return Response({"category":serializer.data})
 

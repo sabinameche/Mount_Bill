@@ -22,7 +22,7 @@ class ExpenseCatApiView(APIView):
             expenseCategory = ExpenseCategory.objects.filter(Q(is_global = True) | Q(company= company))
             
         except ExpenseCategory.DoesNotExist:
-            raise ValidationError({"message":"No such expenseCategory found!"})
+            raise ValidationError({"message":"No expenseCategory found!"})
         serializer = ExpenseCatSerializer(expenseCategory,many = True)
         return Response({"category":serializer.data})
 

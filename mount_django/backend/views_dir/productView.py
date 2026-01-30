@@ -30,8 +30,11 @@ class ProductApiView(APIView):
                 "uid":product.uid,
                 "low_stock":product.low_stock,
             })
-            
-        product = Product.objects.filter(company=company)
+
+        try:    
+            product = Product.objects.filter(company=company)
+        except Product.DoesNotExist:
+            raise ValidationError({"message":"No products found!"})
         serializer = ProductSerializer(product,many=True)
         return Response({"products":serializer.data})
 

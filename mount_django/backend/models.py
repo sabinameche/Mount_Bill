@@ -357,7 +357,7 @@ class ExpenseCategory(models.Model):
 
 class Expense(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE,related_name="expenses")
-    category = models.ForeignKey(ExpenseCategory,on_delete=models.SET_NULL,related_name="category",null = True)
+    category = models.ForeignKey(ExpenseCategory,on_delete=models.PROTECT,related_name="category")
 
     expense_number = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

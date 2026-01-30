@@ -32,8 +32,10 @@ class CustomerApiView(APIView):
                 "customer_type":customer.customer_type,
                 "uid":customer.uid or "",
             })
-        
-        customers = Customer.objects.filter(company=company)
+        try:
+            customers = Customer.objects.filter(company=company)
+        except Customer.DoesNotExist:
+            raise ValidationError({"message":"No Customers found!"})
         serializer = CustomerSerializer(customers,many = True)
 
         return Response({"clients":serializer.data})

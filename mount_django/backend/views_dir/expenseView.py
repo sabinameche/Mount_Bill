@@ -11,15 +11,29 @@ class ExpenseApiView(APIView):
     def __get_company(self):
         return self.request.user.owned_company or self.request.user.active_company
     
-    def get(self,request):
+    def get(self,request,pk=None):
         company = self.__get_company()
         if not company:
             raise ValidationError({"error":"User has no owned or active company!!"})
+        
+        if pk:
+            try:
+                expense = Expense.objects.get(id=pk,company=company)
+            except Expense.DoesNotExist:
+                return Response({"message":"No such expense found!"})
+            return Response(
+                {
+                    "expense_number":expense.expense_number,
+                    "created_at":expense.created_at,
+                    "category":expense.category.name,
+                    "total_amount":expense.total_amount,
+                    "remarks":expense.remarks or "",
+                }
+            )
         try:
             expense = Expense.objects.filter(company=company)
-        
         except Expense.DoesNotExist:
-            return Response({"message":"No such expense found!"})
+            return Response({"message":"No expenses found!"})
         serializer = ExpenseSerializer(expense,many=True)
         return Response({"expenses":serializer.data})
     
