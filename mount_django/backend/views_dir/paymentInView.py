@@ -41,3 +41,32 @@ class PaymentInApiView(APIView):
             serializer.save(company=company)
             return Response(serializer.data)
         return Response(serializer.errors)
+    
+    def patch(self,request,pk):
+        company = self.__get__company()
+        if not company:
+            raise ValidationError({"error":"User has no active or owned company!"})
+        
+        try:
+            paymentIn = PaymentIn.objects.get(id=pk)
+        except PaymentIn.DoesNotExist:
+            raise ValidationError({"error":"No such paymentIn transaction exists!"})
+        
+        serializer = PaymentInSerializer(paymentIn,data = request.data,partial = True)
+        if serializer.is_valid():
+            serializer.save(company=company)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def delete(self,request,pk):
+        company = self.__get__company()
+        if not company:
+            raise ValidationError({"error":"User has no active or owned company!"})
+        
+        try:
+            paymentIn = PaymentIn.objects.get(id=pk)
+        except PaymentIn.DoesNotExist:
+            raise ValidationError({"error":"No such paymentIn transaction exists!"})
+
+        paymentIn.delete()
+        return Response({"message":"PaymentIn deleted successfully!"})

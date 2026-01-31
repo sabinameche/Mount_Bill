@@ -27,5 +27,6 @@ urlpatterns = [
     path("expenseCat/",ExpenseCatApiView.as_view()),
 
     # for paymentIn
-    path("paymentIn/",PaymentInApiView.as_view())
+    path("paymentIn/",PaymentInApiView.as_view()),
+    path("paymentIn/<int:pk>/",PaymentInApiView.as_view())
 ]
