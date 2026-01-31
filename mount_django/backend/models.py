@@ -112,7 +112,9 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.company})"
+
     
+    # if no category saved during product's saving
     def save(self,*args, **kwargs):
         if self.category_id is None:
             self.category,_ = ProductCategory.objects.get_or_create(company=self.company,name="General")
@@ -342,14 +344,34 @@ class BalanceAdjustment(models.Model):
 
 class ExpenseCategory(models.Model):
     name = models.CharField(max_length=100)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE,blank=True, related_name='expense_categories'
+    company = models.ForeignKey(Company, on_delete=models.CASCADE,blank=True,null=True, related_name='expense_categories'
     )
     is_global = models.BooleanField(default= False)
     
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['company','name'],name='unique_expenseCategory_per_company')
+            # a company cannot have duplicate category 
+            models.UniqueConstraint(fields=['company','name'],name='unique_expenseCategory_per_company'),
+
+            # global category list cannot have duplicate category
+            models.UniqueConstraint(fields=['name'],condition=models.Q(is_global=True),name='unique-global-category')
         ]
+    
+    def clean(self):
+
+        # global category must not have a company
+        if self.is_global and self.company is not None:
+            raise ValidationError("Global Categories cannot belong to a company.")
+        
+        # company category must not create category same as global
+        if not self.is_global:
+            if ExpenseCategory.objects.filter(is_global = True,name__iexact = self.name).exists():
+                raise ValidationError( f"'{self.name}' already exists as a global category." )
+
+    def save(self,*args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return self.name
         

@@ -4,5 +4,5 @@ from rest_framework import serializers
 class ProductCatSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
-        fields =["name"]
+        fields =["id","name"]
 
