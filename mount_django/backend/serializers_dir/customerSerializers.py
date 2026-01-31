@@ -2,8 +2,8 @@ from rest_framework import serializers
 from ..models import Customer,RemainingAmount
 from django.db import transaction
 class CustomerSerializer(serializers.ModelSerializer):
-    opening_balance = serializers.DecimalField(max_digits=10,decimal_places=2,write_only = True)
-    customer_opening_type = serializers.CharField(max_length=100,write_only = True)
+    opening_balance = serializers.DecimalField(max_digits=10,decimal_places=2,write_only = True,required=False,default =0)
+    customer_opening_type = serializers.CharField(max_length=100,write_only = True,required = False,default ="TORECEIVE")
     remaining_amount = serializers.SerializerMethodField() 
     class Meta:
         model = Customer
@@ -12,7 +12,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self,validated_data):
         opening_balance = validated_data.pop("opening_balance",0)
-        customer_opening_type = validated_data.pop("customer_opening_type")
+        customer_opening_type = validated_data.pop("customer_opening_type","TORECEIVE")
 
         # create customer
         customer = Customer.objects.create(**validated_data)
@@ -29,5 +29,5 @@ class CustomerSerializer(serializers.ModelSerializer):
         return customer
     
     def get_remaining_amount(self, obj):
-        remaining_obj = obj.customerRemainingAmount.first() 
+        remaining_obj = obj.customerRemainingAmount.order_by('-id').first() 
         return remaining_obj.remaining_amount if remaining_obj else 0

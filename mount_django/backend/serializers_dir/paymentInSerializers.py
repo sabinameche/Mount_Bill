@@ -1,7 +1,23 @@
 from rest_framework import serializers
-from ..models import PaymentIn
+from decimal import Decimal
+from ..models import PaymentIn,RemainingAmount
 class PaymentInSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentIn
         fields = "__all__"
         read_only_fields = ["id","created_at","company","remainings"]
+
+    def create(self,validated_data):
+        
+        customer = validated_data["customer"]
+        paymentIn = Decimal(validated_data["payment_in"])
+        
+        latest_remaining = RemainingAmount.objects.filter(customer=customer).order_by('-id').first()
+        latest_amount = latest_remaining.remaining_amount if latest_remaining else Decimal("0.0")
+
+        current_remaining = latest_amount - paymentIn
+
+        new_remaining = RemainingAmount.objects.create(customer=customer,remaining_amount = current_remaining)
+
+        payment = PaymentIn.objects.create(remainings= new_remaining,**validated_data)
+        return payment
