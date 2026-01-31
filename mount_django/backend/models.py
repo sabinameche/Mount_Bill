@@ -212,7 +212,7 @@ class OrderSummary(models.Model):
 
 class RemainingAmount(models.Model):
     customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, related_name="customer"
+        Customer, on_delete=models.CASCADE, related_name="customerRemainingAmount"
     )
     orders = models.OneToOneField(
         OrderList, on_delete=models.CASCADE, related_name="remaining",null=True,blank=True

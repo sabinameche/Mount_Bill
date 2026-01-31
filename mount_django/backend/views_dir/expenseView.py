@@ -21,15 +21,8 @@ class ExpenseApiView(APIView):
                 expense = Expense.objects.get(id=pk,company=company)
             except Expense.DoesNotExist:
                 return Response({"message":"No such expense found!"})
-            return Response(
-                {
-                    "expense_number":expense.expense_number,
-                    "created_at":expense.created_at,
-                    "category":expense.category.name,
-                    "total_amount":expense.total_amount,
-                    "remarks":expense.remarks or "",
-                }
-            )
+            serializer = ExpenseSerializer(expense)
+            return Response({"expenses":serializer.data})
         try:
             expense = Expense.objects.filter(company=company)
         except Expense.DoesNotExist:

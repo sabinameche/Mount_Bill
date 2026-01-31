@@ -22,14 +22,8 @@ class ProductApiView(APIView):
                 product = Product.objects.get(id=pk,company=company)
             except Product.DoesNotExist:
                 raise ValidationError({"error":"No such Product found!"})
-            return Response({
-                "name":product.name,
-                "cost_price":product.cost_price,
-                "selling_price":product.selling_price,
-                "category":product.category.name,
-                "uid":product.uid,
-                "low_stock":product.low_stock,
-            })
+            serializer = ProductSerializer(product)
+            return Response({"products":serializer.data})
 
         try:    
             product = Product.objects.filter(company=company)

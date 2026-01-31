@@ -23,15 +23,8 @@ class CustomerApiView(APIView):
                 customer = Customer.objects.get(id=pk,company=company)
             except Customer.DoesNotExist:
                 raise ValidationError({"error":"No such customer found!"})
-            return Response({
-                "name":customer.name,
-                "phone":customer.phone or "",
-                "address":customer.address or "",
-                "pan_id":customer.pan_id or "",
-                "email":customer.email or  "",
-                "customer_type":customer.customer_type,
-                "uid":customer.uid or "",
-            })
+            serializer = CustomerSerializer(customer)
+            return Response({"clients":serializer.data})
         try:
             customers = Customer.objects.filter(company=company)
         except Customer.DoesNotExist:
