@@ -28,7 +28,7 @@ class PaymentInSerializer(serializers.ModelSerializer):
     def update(self,instance,validated_data):
         
         payment_in = validated_data["payment_in"]
-        remarks = validated_data["remarks"]
+        remarks = validated_data.get("remarks","")
 
         current_remaining = instance.remainings.remaining_amount
         current_amount = instance.payment_in
