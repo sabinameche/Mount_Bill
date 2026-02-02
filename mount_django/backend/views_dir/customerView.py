@@ -5,6 +5,7 @@ from rest_framework import status
 from ..serializers_dir.customerSerializers import CustomerSerializer
 from ..models import Customer
 from rest_framework.permissions import IsAuthenticated
+from ..services.customer_service import CustomerService
 
 class CustomerApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -39,10 +40,12 @@ class CustomerApiView(APIView):
             raise ValidationError({"company":"User has no active/owned company!!"})
         
         serializer = CustomerSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save(company = company)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception = True)
+        
+        customer = CustomerService.create_customer(serializer.validated_data,company)
+        response_serializer = CustomerSerializer(customer)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+    
     
     def patch(self,request,pk):
         company = self.__get_company()

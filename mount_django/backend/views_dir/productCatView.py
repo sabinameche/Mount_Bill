@@ -12,11 +12,19 @@ class ProductCatApiView(APIView):
     def __get__company(self):
         return self.request.user.owned_company or self.request.user.active_company
     
-    def get(self,request):
+    def get(self,request,pk = None):
         company = self.__get__company()
         if not company:
             raise ValidationError({"error":"User has no owned/active company!!"})
 
+        if pk:
+            try:
+                productCategory = ProductCategory.objects.get(id = pk)
+            except ProductCategory.DoesNotExist:
+                raise ValidationError({"message":"No productCategory found!"}) 
+            serializer = ProductCatSerializer(productCategory) 
+            return Response({"category":serializer.data})
+         
         try:
             productCategory = ProductCategory.objects.filter(company=company)
         except ProductCategory.DoesNotExist:

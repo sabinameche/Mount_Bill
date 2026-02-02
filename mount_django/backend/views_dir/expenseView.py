@@ -25,10 +25,13 @@ class ExpenseApiView(APIView):
             return Response({"expenses":serializer.data})
         try:
             expense = Expense.objects.filter(company=company)
+            expense_count = expense.count()
         except Expense.DoesNotExist:
             return Response({"message":"No expenses found!"})
         serializer = ExpenseSerializer(expense,many=True)
-        return Response({"expenses":serializer.data})
+        
+        return Response({"expenses":serializer.data,
+                         "expense_count":expense_count})
     
     def post(self,request):
         company = self.__get_company()

@@ -18,6 +18,7 @@ urlpatterns = [
 
     # api for productCategory
     path("productCat/",ProductCatApiView.as_view()),
+    path("productCat/<int:pk>/",ProductCatApiView.as_view()),
 
     # api for expense
     path("expense/",ExpenseApiView.as_view()),
@@ -25,6 +26,7 @@ urlpatterns = [
 
     # api for expenseCategory
     path("expenseCat/",ExpenseCatApiView.as_view()),
+    path("expenseCat/<int:pk>/",ExpenseCatApiView.as_view()),
 
     # for paymentIn
     path("paymentIn/",PaymentInApiView.as_view()),
