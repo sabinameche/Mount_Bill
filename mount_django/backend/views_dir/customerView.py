@@ -23,13 +23,13 @@ class CustomerApiView(APIView):
             try:
                 customer = Customer.objects.get(id=pk,company=company)
             except Customer.DoesNotExist:
-                raise ValidationError({"error":"No such customer found!"})
+                raise ValidationError({"error":"No such client found!"})
             serializer = CustomerSerializer(customer)
             return Response({"clients":serializer.data})
         try:
             customers = Customer.objects.filter(company=company)
         except Customer.DoesNotExist:
-            raise ValidationError({"message":"No Customers found!"})
+            raise ValidationError({"message":"No Clients found!"})
         serializer = CustomerSerializer(customers,many = True)
 
         return Response({"clients":serializer.data})
@@ -55,7 +55,7 @@ class CustomerApiView(APIView):
         try:
             customer = Customer.objects.get(id=pk,company=company)
         except Customer.DoesNotExist:
-            return Response({"message": "No such customer found"}, status=404)
+            return Response({"message": "No such client found"}, status=404)
         serializer = CustomerSerializer(customer,data = request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -71,7 +71,7 @@ class CustomerApiView(APIView):
         try:
             customer = Customer.objects.get(id=pk,company=company)
         except Customer.DoesNotExist:
-            return Response({"message": "No such customer found"})
+            return Response({"message": "No such client found"})
         
         customer.delete()
-        return Response({"message": "Customer deleted successfully"})
+        return Response({"message": "Client deleted successfully"})
