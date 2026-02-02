@@ -5,6 +5,7 @@ from rest_framework import status
 from ..serializers_dir.paymentInSerializers import PaymentInSerializer
 from ..models import PaymentIn
 from rest_framework.permissions import IsAuthenticated
+from ..services.payment_in_service import PaymentInService
 
 class PaymentInApiView(APIView):
     permission_classes =[IsAuthenticated]
@@ -37,10 +38,11 @@ class PaymentInApiView(APIView):
             raise ValidationError({"error":"User has no active or owned company!"})
         
         serializer = PaymentInSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save(company=company)
-            return Response(serializer.data)
-        return Response(serializer.errors)
+        serializer.is_valid(raise_exception=True)
+
+        payment_in = PaymentInService.create_payment_in(serializer.validated_data,company)
+        response_serializer = PaymentInSerializer(payment_in)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
     
     def patch(self,request,pk):
         company = self.__get__company()
@@ -53,10 +55,11 @@ class PaymentInApiView(APIView):
             raise ValidationError({"error":"No such paymentIn transaction exists!"})
         
         serializer = PaymentInSerializer(paymentIn,data = request.data,partial = True)
-        if serializer.is_valid():
-            serializer.save(company=company)
-            return Response(serializer.data)
-        return Response(serializer.errors)
+        serializer.is_valid(raise_exception=True)
+
+        updated_payment_out = PaymentInService.update_payment_in(paymentIn,serializer.validated_data)
+        response_serializer = PaymentInSerializer(updated_payment_out)
+        return Response(response_serializer.data)
     
     def delete(self,request,pk):
         company = self.__get__company()

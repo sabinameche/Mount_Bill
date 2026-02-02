@@ -344,6 +344,7 @@ class BalanceAdjustment(models.Model):
 
 class ExpenseCategory(models.Model):
     name = models.CharField(max_length=100)
+    
     company = models.ForeignKey(Company, on_delete=models.CASCADE,blank=True,null=True, related_name='expense_categories'
     )
     is_global = models.BooleanField(default= False)
