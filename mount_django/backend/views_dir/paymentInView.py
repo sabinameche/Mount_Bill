@@ -21,10 +21,12 @@ class PaymentInApiView(APIView):
         if pk:
             try:
                 paymentIn = PaymentIn.objects.get(id= pk)
+                customer_name = paymentIn.customer.name
             except PaymentIn.DoesNotExist:
                 raise ValidationError({"error":"No paymentIn transation found!"})
             serializer = PaymentInSerializer(paymentIn)
-            return Response({"paymentIn":serializer.data})
+            return Response({"paymentIn":serializer.data,
+                             "customer_name":customer_name})
         try:
             paymentIn = PaymentIn.objects.filter(company= company)
         except PaymentIn.DoesNotExist:

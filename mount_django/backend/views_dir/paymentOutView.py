@@ -21,10 +21,12 @@ class PaymentOutApiView(APIView):
         if pk:
             try:
                 paymentOut = PaymentOut.objects.get(id=pk)
+                customer_name = paymentOut.customer.name
             except PaymentOut.DoesNotExist:
                 raise ValidationError({"error": "No paymentOut transaction found!"})
             serializer = PaymentOutSerializer(paymentOut)
-            return Response({"paymentOut": serializer.data})
+            return Response({"paymentOut": serializer.data,
+                             "customer_name":customer_name})
         
         paymentOut = PaymentOut.objects.filter(company=company)
         serializer = PaymentOutSerializer(paymentOut, many=True)

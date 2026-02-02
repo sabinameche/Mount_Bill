@@ -5,6 +5,6 @@ from django.db import transaction
 class PaymentInSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentIn
-        fields = "__all__"
+        fields = ["id","created_at","payment_in","remarks"]
         read_only_fields = ["id","created_at","company","remainings"]
 
