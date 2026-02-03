@@ -998,6 +998,9 @@ export function activateButton(selectedBtn, otherBtn) {
     otherBtn.classList.remove('border-blue-700', 'text-blue-700', 'bg-blue-100');
 }
 
+
+
+
 // all the add transaction button functions
 document.addEventListener('DOMContentLoaded', () => {
   const addTransaction = document.getElementById('addTransaction');
@@ -1150,13 +1153,9 @@ closeAdjustBalance.addEventListener('click',()=>{
     activateButton(addBtn, reduceBtn);
     document.getElementById('currentBalance').value = '';
     document.getElementById('adjustedBalance').value = '';
-    const addAmount = document.getElementById('addAmount');
-    const reduceAmount = document.getElementById('reduceAmount');
-    if(addAmount){
-        addAmount.value ='';
-    }
-    else if(reduceAmount){
-        reduceAmount.value ='';
+    const adjustmentAmount = document.getElementById('adjustmentAmount');
+    if(adjustmentAmount){
+        adjustmentAmount.value ='';
     }
     document.getElementById('adjustBalanceModal').classList.add('hidden');
 })
@@ -1164,45 +1163,18 @@ cancelAdjustBalance.addEventListener('click',()=>{
     activateButton(addBtn, reduceBtn);
     document.getElementById('currentBalance').value = '';
     document.getElementById('adjustedBalance').value = '';
-    const addAmount = document.getElementById('addAmount');
-    const reduceAmount = document.getElementById('reduceAmount');
-    if(addAmount){
-        addAmount.value ='';
-    }
-    else if(reduceAmount){
-        reduceAmount.value ='';
+    const adjustmentAmount = document.getElementById('adjustmentAmount');
+    if(adjustmentAmount){
+        adjustmentAmount.value ='';
     }
     document.getElementById('adjustBalanceModal').classList.add('hidden');
 })
 
 //add Balance
 // Elements
-const addAmount = document.getElementById('addAmount');
-const reduceAmount = document.getElementById('reduceAmount');
+const adjustmentAmount = document.getElementById('adjustmentAmount');
 const addBtn = document.getElementById('addBalance');
 const reduceBtn = document.getElementById('reduceBalance');
-
-// Default: Add Balance selected
-activateButton(addBtn, reduceBtn);
-addAmount.classList.remove('hidden');
-reduceAmount.classList.add('hidden');
-
-
-addBtn.addEventListener('click', () => {
-    activateButton(addBtn, reduceBtn);
-    addAmount.classList.remove('hidden');
-    reduceAmount.classList.add('hidden');
-    addAmount.value = '';
-    reduceAmount.value = '';
-});
-
-reduceBtn.addEventListener('click', () => {
-    activateButton(reduceBtn, addBtn);
-    reduceAmount.classList.remove('hidden');
-    addAmount.classList.add('hidden');
-    addAmount.value = '';
-    reduceAmount.value = '';
-});
 
 //after form fill up and confirm adjustment btn clicked 
 const balanceAdjustment = document.getElementById('balanceAdjust')
@@ -1210,17 +1182,21 @@ balanceAdjustment.dataset.clientId = addTransaction.dataset.clientId;
 balanceAdjustment.addEventListener('click',async()=>{
     await balanceAdjustmentFunc(balanceAdjustment.dataset.clientId);
 })
+
+
 });
+
+
+let adjustmentType = 'ADD'; //default
 
 //balanceAdjustment function
 async function balanceAdjustmentFunc(clientId){
     const addBtn = document.getElementById('addBalance');
     const reduceBtn = document.getElementById('reduceBalance');
-    const addAmount = document.getElementById('addAmount')?.value || 0;
-    const reduceAmount = document.getElementById('reduceAmount')?.value || 0;
+    const adjustmentAmounts = document.getElementById('adjustmentAmount')?.value;
     const adjustmentRemark = document.getElementById('adjustmentRemarks').value;
 
-     const balanceAdjust = document.getElementById('balanceAdjust');
+    const balanceAdjust = document.getElementById('balanceAdjust');
     const originalText = balanceAdjust.innerHTML;
         
     balanceAdjust.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adjusting...';
@@ -1228,8 +1204,8 @@ async function balanceAdjustmentFunc(clientId){
     //preparing to send the data
     try{
         const adjustmentAmount = {
-                toAddAmount:addAmount,
-                toReduceAmount:reduceAmount,
+                type:adjustmentType,
+                toAdjustAmount:adjustmentAmounts,
                 adjustment_remark:adjustmentRemark,
             }
         // Send AJAX request to Django
@@ -1250,20 +1226,12 @@ async function balanceAdjustmentFunc(clientId){
                 await new Promise(resolve => setTimeout(resolve,1500));
 
                 //resetting the form
-                document.getElementById('addAmount').value = '';
-                document.getElementById('reduceAmount').value = '';
+                document.getElementById('adjustmentAmount').value = '';
                 document.getElementById('adjustmentRemarks').value = '';
                 document.getElementById('adjustBalanceModal').classList.add('hidden');
                 document.getElementById('currentBalance').value = '';
                 document.getElementById('adjustedBalance').value = '';
-                const addAmount = document.getElementById('addAmount');
-                const reduceAmount = document.getElementById('reduceAmount');
-                if(addAmount){
-                    addAmount.value ='';
-                }
-                else if(reduceAmount){
-                    reduceAmount.value ='';
-                }
+                document.getElementById('adjustmentAmount').value = '';
                 activateButton(addBtn, reduceBtn);
             }else {
             showAlert(result.message || "Adjustment failed");
@@ -1279,11 +1247,31 @@ async function balanceAdjustmentFunc(clientId){
 }
 
 //footer of the adjust balance
+
 document.addEventListener('DOMContentLoaded',async()=>{
-const addAmount = document.getElementById('addAmount');
-const reduceAmount = document.getElementById('reduceAmount');
+const adjustmentAmount = document.getElementById('adjustmentAmount');
 const adjustedBalance = document.getElementById('adjustedBalance');
 const currentBalance = document.getElementById('currentBalance');
+const addBtn = document.getElementById('addBalance');
+const reduceBtn = document.getElementById('reduceBalance'); 
+
+// Default: Add Balance selected
+activateButton(addBtn, reduceBtn);
+
+if(addBtn){
+addBtn.addEventListener('click', () => {
+    activateButton(addBtn, reduceBtn);
+    adjustmentType = 'ADD';
+});
+}
+
+if(reduceBtn){
+reduceBtn.addEventListener('click', () => {
+    activateButton(reduceBtn, addBtn);
+    adjustmentType = 'REDUCE';
+    
+});
+}
 
 const clientId = getUidFromUrl();
 if(!clientId) return;
@@ -1291,18 +1279,14 @@ const data = await clientLatestRemaining(clientId)
 currentBalance.value = Number(data.remaining)
 adjustedBalance.value = Number(data.remaining) 
 //dynamic change at the footer
-if(addAmount){
-    addAmount.addEventListener('input',async()=>{
-        adjustedBalance.value = Number(currentBalance.value)  + Number(addAmount.value)
-
-    })
-}
-if(reduceAmount){
-    reduceAmount.addEventListener('input',async()=>{
-        adjustedBalance.value  = Number(currentBalance.value)  - Number(reduceAmount.value)
-
-    })
-}
+adjustmentAmount.addEventListener('input', () => {
+        if (adjustmentType === 'ADD') {
+            adjustedBalance.value = Number(currentBalance.value) + Number(adjustmentAmount.value);
+        } else if (adjustmentType === 'REDUCE') {
+            adjustedBalance.value = Number(currentBalance.value) - Number(adjustmentAmount.value);
+        }
+        console.log("adjustedBalance:", adjustedBalance.value);
+    });
 
 })
 

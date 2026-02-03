@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CustomerApiView,ProductApiView,ExpenseApiView,ProductCatApiView,ExpenseCatApiView,PaymentInApiView,PaymentOutApiView,OrderListApiView
+from .views import CustomerApiView,ProductApiView,ExpenseApiView,ProductCatApiView,ExpenseCatApiView,PaymentInApiView,PaymentOutApiView,OrderListApiView,BalanceAdjustApiView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -39,4 +39,7 @@ urlpatterns = [
     # for orderlist
     path('bill/',OrderListApiView.as_view()),
     path('bill/<int:pk>/',OrderListApiView.as_view()),
+
+    # for balanceadjustment
+    path('balanceAdjust/',BalanceAdjustApiView.as_view())
 ]
