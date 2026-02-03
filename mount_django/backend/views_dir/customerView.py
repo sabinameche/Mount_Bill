@@ -34,17 +34,26 @@ class CustomerApiView(APIView):
 
         return Response({"clients":serializer.data})
     
-    def post(self,request):
+    def post(self, request):
         company = self.__get_company()
+
         if not company:
             raise ValidationError({"company":"User has no active/owned company!!"})
         
-        serializer = CustomerSerializer(data = request.data)
-        serializer.is_valid(raise_exception = True)
-        
-        customer = CustomerService.create_customer(serializer.validated_data,company)
-        response_serializer = CustomerSerializer(customer)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        serializer = CustomerSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                customer = CustomerService.create_customer(
+                    serializer.validated_data,
+                    company=company 
+                )
+                customer_data = CustomerSerializer(customer).data
+                return Response({"success": True,"client":customer_data,"message": "Customer created successfully."
+                }, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({"error": str(e)}, status=500)
+        else:
+            return Response({"success": False,"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     
     def patch(self,request,pk):

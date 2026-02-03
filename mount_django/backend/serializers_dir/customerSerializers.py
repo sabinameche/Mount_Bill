@@ -3,7 +3,9 @@ from ..models import Customer,RemainingAmount
 from django.db import transaction
 class CustomerSerializer(serializers.ModelSerializer):
     opening_balance = serializers.DecimalField(max_digits=10,decimal_places=2,write_only = True,required=False,default =0)
-    customer_opening_type = serializers.CharField(max_length=100,write_only = True,required = False,default ="TORECEIVE")
+    customer_opening_type = serializers.ChoiceField(
+        choices=["TORECEIVE", "TOGIVE"], default="TORECEIVE", write_only = True
+    )
     remaining_amount = serializers.SerializerMethodField() 
     class Meta:
         model = Customer
