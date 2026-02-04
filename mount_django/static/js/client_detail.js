@@ -707,7 +707,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     //reduce balance adjustment
     adjustReduceAmount.addEventListener('click',async()=>{
-        console.log("yaa k xa ??",adjustReduceAmount.dataset.id)
         await updateReduceAdjustment(adjustReduceAmount.dataset.id)
     }) 
     //closing the editAdjustModal

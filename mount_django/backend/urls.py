@@ -41,5 +41,6 @@ urlpatterns = [
     path('bill/<int:pk>/',OrderListApiView.as_view()),
 
     # for balanceadjustment
-    path('balanceAdjust/',BalanceAdjustApiView.as_view())
+    path('balanceAdjust/',BalanceAdjustApiView.as_view()),
+    path('balanceAdjust/<int:pk>/',BalanceAdjustApiView.as_view())
 ]
