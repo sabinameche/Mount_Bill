@@ -4,10 +4,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from ..serializers_dir.expenseSerializers import ExpenseSerializer
 from ..models import Expense
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 
 class ExpenseApiView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    queryset = Expense.objects.all()
+
     def __get_company(self):
         return self.request.user.owned_company or self.request.user.active_company
     

@@ -4,12 +4,14 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from ..serializers_dir.productSerializers import ProductSerializer
 from ..models import Product
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 
 
 class ProductApiView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    queryset = Product.objects.all()
+
     def __get_company(self):
         return self.request.user.owned_company or self.request.user.active_company
 

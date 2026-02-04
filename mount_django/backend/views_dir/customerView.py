@@ -4,14 +4,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from ..serializers_dir.customerSerializers import CustomerSerializer
 from ..models import Customer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 from ..services.customer_service import CustomerService
 
 class CustomerApiView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    queryset = Customer.objects.all()
+    
     def __get_company(self):
-        return self.request.user.active_company or self.request.user.owned_company
+        return self.request.user.owned_company or self.request.user.active_company
     
     def get(self,request,pk=None):
         company = self.__get_company()
