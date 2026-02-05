@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from django.contrib.auth.models import Group
 
 class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True)
@@ -34,6 +35,7 @@ class User(AbstractUser):
         return self.username
 
 class Company(models.Model):
+    # owner = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="owned_company")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -49,6 +51,11 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+
+# class CompanyGroup(models.Model):
+#     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+#     group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    
 
 class Customer(models.Model):  # sabina
     company = models.ForeignKey(

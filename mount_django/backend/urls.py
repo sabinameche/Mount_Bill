@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CustomerApiView,ProductApiView,ExpenseApiView,ProductCatApiView,ExpenseCatApiView,PaymentInApiView,PaymentOutApiView,OrderListApiView,BalanceAdjustApiView
+from .views import CustomerApiView,ProductApiView,ExpenseApiView,ProductCatApiView,ExpenseCatApiView,PaymentInApiView,PaymentOutApiView,OrderListApiView,BalanceAdjustApiView,PermissionApiview,RoleApiView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -7,6 +7,10 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    # for user management permission
+    path("permissions/<int:group_id>/",PermissionApiview.as_view()),
+    path("roles/",RoleApiView.as_view()),
 
     # api for client
     path("client/",CustomerApiView.as_view(),name="customer_list"),
