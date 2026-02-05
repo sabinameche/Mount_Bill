@@ -10,7 +10,7 @@ from .views_dir.paymentInView import PaymentInApiView
 from .views_dir.paymentOutView import PaymentOutApiView
 from .views_dir.orderListView import OrderListApiView
 from .views_dir.balanceAdjustView import BalanceAdjustApiView
-from .views_dir.permissionView import PermissionApiview,RoleApiView
+from .views_dir.permissionView import PermissionApiView,RoleApiView
 
 CustomerApiView = CustomerApiView
 ProductApiView = ProductApiView
@@ -21,7 +21,7 @@ PaymentInApiView = PaymentInApiView
 PaymentOutApiView = PaymentOutApiView
 OrderListApiView = OrderListApiView
 BalanceAdjustApiView = BalanceAdjustApiView
-PermissionApiview = PermissionApiview
+PermissionApiview = PermissionApiView
 RoleApiView = RoleApiView
         
 

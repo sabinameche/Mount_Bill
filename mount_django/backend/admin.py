@@ -21,8 +21,16 @@ from .models import (
     ExpenseCategory,
     Expense,
     Purchase,
+    CompanyRole,
 )
 
+# @admin.register(CompanyGroup)
+# class CompanyGroupAdmin(admin.ModelAdmin):
+#     list_display = ("company","group")
+
+@admin.register(CompanyRole)
+class CompanyRoleAdmin(admin.ModelAdmin):
+    list_display = ("id","name","company")
 
 # Company Admin
 @admin.register(Company)

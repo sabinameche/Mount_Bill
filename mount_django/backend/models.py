@@ -6,8 +6,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-
-from django.contrib.auth.models import Group
+from django.conf import settings
+from django.contrib.auth.models import Group,Permission
 
 class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True)
@@ -35,7 +35,11 @@ class User(AbstractUser):
         return self.username
 
 class Company(models.Model):
-    # owner = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="owned_company")
+    owner = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="own_company",
+    )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -43,7 +47,9 @@ class Company(models.Model):
     tax_id = models.CharField(max_length=15, blank=True)
 
     managers = models.ManyToManyField(
-        User, related_name="managed_companies", blank=True
+        settings.AUTH_USER_MODEL,
+        related_name="managed_companies",
+        blank=True
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -52,11 +58,29 @@ class Company(models.Model):
         return self.name
 
 
+
+    
+class CompanyRole(models.Model):
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="roles"
+    )
+    name = models.CharField(max_length=150)
+    permissions = models.ManyToManyField(Permission, blank=True)
+
+    class Meta:
+        unique_together = ("company", "name")
+
+    def __str__(self):
+        return f"{self.company.name} - {self.name}"
+
+
 # class CompanyGroup(models.Model):
 #     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-#     group = models.OneToOneField(Group, on_delete=models.CASCADE)
-    
+#     group = models.OneToOneField(CompanyRole, on_delete=models.CASCADE)
 
+           
 class Customer(models.Model):  # sabina
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name="customers"
